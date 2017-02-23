@@ -395,5 +395,42 @@ namespace JclunaOficial
             using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
                 return ExecuteTable(command, null);
         }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa multiple conjuntos de datos en modo desconectado
+        /// </summary>
+        /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
+        /// <returns>Regresa un objeto <see cref="DataTable"/> con los datos generados por la instrucción</returns>
+        public DataSet ExecuteDataset(DbCommand command, params UDbParameter[] parameters)
+        {
+            // asociar el contexto de datos
+            LinkDbContext(command, parameters);
+
+            // ejecutar la instrucción y extraer los datos
+            DataSet objResult = null;
+            using (var adapter = factory.CreateDataAdapter())
+                if (adapter != null)
+                {
+                    // proceder con la extracción
+                    objResult = new DataSet();
+                    adapter.SelectCommand = command;
+                    adapter.Fill(objResult);
+                }
+            return objResult;
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa multiple conjuntos de datos en modo desconectado
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns>Regresa un objeto <see cref="DataTable"/> con los datos generados por la instrucción</returns>
+        public DataSet ExecuteDataset(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
+                return ExecuteDataset(command, null);
+        }
     }
 }

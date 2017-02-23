@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -431,6 +432,48 @@ namespace JclunaOficial
         {
             using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
                 return ExecuteDataset(command, null);
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un <see cref="Dictionary{String, Object}"/> con los datos de un registro
+        /// </summary>
+        /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
+        /// <returns>Regresa un <see cref="Dictionary{String, Object}"/> con los datos de un registro</returns>
+        public Dictionary<string, object> ExecuteRow(DbCommand command, params UDbParameter[] parameters)
+        {
+            var objResult = new Dictionary<string, object>();
+
+            // recuperar los datos en una tabla
+            var objData = ExecuteTable(command, parameters);
+            if (objData == null || objData.Rows.Count == 0)
+                return objResult; // no hay registros
+
+            // trabajar con el primer (y teoricamente único) registro recuperado
+            var objRow = objData.Rows[0];
+            for (int i = 0; i < objData.Columns.Count; i++)
+            {
+                // cada columna, representa un elemento de la lista
+                var column = objData.Columns[i];
+                if (objResult.ContainsKey(column.ColumnName))
+                    objResult.Add(column.ColumnName + i, objRow[i]);
+                else
+                    objResult.Add(column.ColumnName, objRow[i]);
+            }
+            return objResult;
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un <see cref="Dictionary{String, Object}"/> con los datos de un registro
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns>Regresa un <see cref="Dictionary{String, Object}"/> con los datos de un registro</returns>
+        public Dictionary<string, object> ExecuteRow(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
+                return ExecuteRow(command, null);
         }
     }
 }

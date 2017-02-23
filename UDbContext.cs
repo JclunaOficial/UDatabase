@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 
@@ -58,6 +59,7 @@ namespace JclunaOficial
             }
         }
 
+        // preparar contexto usando el proveedor y cadena de conexión recibidos
         private void SetupWithProvider(string providerName, string connectionString, bool open, bool begin, IsolationLevel level)
         {
             // el proveedor de datos es requerido
@@ -87,6 +89,79 @@ namespace JclunaOficial
                 else
                     Open(); // conectar a DB sin transacción.
             }
+        }
+
+        // preparar contexto usando la sección connectionString con el nombre especificado
+        private void SetupWithSettings(string name, bool open, bool begin, IsolationLevel level)
+        {
+            // evaluar el nombre de la conexión a usar
+            var settingName = (name == null ? "" : name.Trim());
+            ConnectionStringSettings settings = null;
+
+            // obtener las configuraciones de conexión
+            if (settingName.Length > 0)
+            {
+                // recuperar la configuración con el nombre especificado
+                settings = ConfigurationManager.ConnectionStrings[settingName];
+                if (settings == null) throw new ArgumentException("Connection String [" + settingName + "] does not exists in configuration file section [ConnectionStrings]", "name");
+            }
+            else
+            {
+                // recuperar la primera configuración registrada
+                if (ConfigurationManager.ConnectionStrings == null ||
+                    ConfigurationManager.ConnectionStrings.Count == 0)
+                    throw new ConfigurationErrorsException("No [ConnectionStrings] section in configuration file.");
+                settings = ConfigurationManager.ConnectionStrings[0];
+            }
+
+            // aplicar la configuración usando el proveedor de la sección
+            SetupWithProvider(settings.ProviderName, settings.ConnectionString, open, begin, level);
+        }
+
+        /// <summary>
+        /// Crear una instancia del tipo <see cref="UDbContext"/>
+        /// </summary>
+        public UDbContext() : this(false)
+        {
+        }
+
+        /// <summary>
+        /// Crear una instancia del tipo <see cref="UDbContext"/>
+        /// </summary>
+        /// <param name="open">Abrir la conexión con la base de datos</param>
+        /// <param name="begin">Iniciar el contexto de transacción</param>
+        /// <param name="level">Nivel de aislamiento de los datos en transacción (valor por defecto: ReadCommited)</param>
+        public UDbContext(bool open, bool begin = false, IsolationLevel level = IsolationLevel.ReadCommitted)
+        {
+            // aplicar la primer conexión registrada, sin conectar
+            SetupWithSettings("", false, false, level);
+        }
+
+        /// <summary>
+        /// Crear una instancia del tipo <see cref="UDbContext"/>
+        /// </summary>
+        /// <param name="settingName">Nombre de la configuración dentro de la sección [ConnectionStrings] del archivo de configuraciones</param>
+        /// <param name="open">Abrir la conexión con la base de datos</param>
+        /// <param name="begin">Iniciar el contexto de transacción</param>
+        /// <param name="level">Nivel de aislamiento de los datos en transacción (valor por defecto: ReadCommited)</param>
+        public UDbContext(string settingName, bool open = false, bool begin = false, IsolationLevel level = IsolationLevel.ReadCommitted)
+        {
+            // aplicar la conexión especificada
+            SetupWithSettings("", false, false, level);
+        }
+
+        /// <summary>
+        /// Crear una instancia del tipo <see cref="UDbContext"/>
+        /// </summary>
+        /// <param name="providerName">Proveedor de datos para fabricar los objetos (ejemplo: System.Data.SqlClient o System.Data.MySqlClient)</param>
+        /// <param name="connectionString">Cadena de conexión para la base de datos</param>
+        /// <param name="open">Abrir la conexión con la base de datos</param>
+        /// <param name="begin">Iniciar el contexto de transacción</param>
+        /// <param name="level">Nivel de aislamiento de los datos en transacción (valor por defecto: ReadCommited)</param>
+        public UDbContext(string providerName, string connectionString, bool open = false, bool begin = false, IsolationLevel level = IsolationLevel.ReadCommitted)
+        {
+            // aplicar la configuración especificada por el proveedor de datos
+            SetupWithProvider(providerName, connectionString, open, begin, level);
         }
 
         /// <summary>

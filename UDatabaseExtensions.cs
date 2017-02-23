@@ -5,7 +5,7 @@ using System.Data.Common;
 namespace JclunaOficial
 {
     /// <summary>
-    /// Funciones extendidas para el acceso a datos
+    /// Clase con funciones extendidas
     /// </summary>
     public static class UDatabaseExtensions
     {
@@ -128,6 +128,124 @@ namespace JclunaOficial
             // localizar el parámetro y asignar el valor
             if (command.Parameters.Contains(parameterName))
                 command.Parameters[parameterName].Value = fixValue(value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="string"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static string GetDbString(this object value, string defaultValue = "")
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : value.ToString());
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="bool"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static bool GetDbBoolean(this object value, bool defaultValue = false)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (bool)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="DateTime"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <returns>Regresa <see cref="DateTime.MinValue"/> cuando el objeto es nulo</returns>
+        public static DateTime GetDbDateTime(this object value)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                DateTime.MinValue : (DateTime)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="byte[]"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <returns>Regresa <see cref="byte[]"/> cuando el objeto es nulo</returns>
+        public static byte[] GetDbArray(this object value)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                new byte[] { } : (byte[])value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="byte"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static byte GetDbByte(this object value, byte defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (byte)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="short"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static short GetDbShort(this object value, short defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (short)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="int"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static int GetDbInteger(this object value, int defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (int)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="long"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static long GetDbLong(this object value, long defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (long)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="decimal"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static decimal GetDbDecimal(this object value, decimal defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (decimal)value);
+        }
+
+        /// <summary>
+        /// Extraer el valor <see cref="double"/> del objeto
+        /// </summary>
+        /// <param name="value">Objeto a evaluar</param>
+        /// <param name="defaultValue">Valor por defecto en caso de que el objeto sea nulo</param>
+        /// <returns></returns>
+        public static double GetDbDouble(this object value, double defaultValue = 0)
+        {
+            return (value == null || value.Equals(DBNull.Value) ?
+                defaultValue : (double)value);
         }
     }
 }

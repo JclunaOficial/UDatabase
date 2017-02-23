@@ -7,7 +7,7 @@ using System.Data.Common;
 namespace JclunaOficial
 {
     /// <summary>
-    /// Contexto de acceso a los datos
+    /// Clase para trabajar en el contexto de una base de datos
     /// </summary>
     public class UDbContext : IDisposable
     {

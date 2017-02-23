@@ -4,7 +4,7 @@ using System.Data;
 namespace JclunaOficial
 {
     /// <summary>
-    /// Parámetro de datos
+    /// Clase con información de un parámetro de un objeto <see cref="IDbCommand"/>
     /// </summary>
     public class UDbParameter
     {

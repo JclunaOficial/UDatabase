@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UDatabaseExtensions.cs" />
     <Compile Include="UDbContext.cs" />
     <Compile Include="UDbParameter.cs" />
   </ItemGroup>

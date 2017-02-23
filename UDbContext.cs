@@ -119,8 +119,11 @@ namespace JclunaOficial
         }
 
         // asociar el contexto de datos al objeto de comando, incluyendo la transacción actual
-        private void LinkDbContext(DbCommand command)
+        private void LinkDbContext(DbCommand command, UDbParameter[] parameters)
         {
+            // agregar los parametros al comando
+            command.AddParameter(parameters);
+
             // asociar la conexión
             command.Connection = connection;
             if (transaction != null) // asociar la transacción
@@ -280,11 +283,8 @@ namespace JclunaOficial
         /// <returns><see cref="int"/> con el número de registros afectados</returns>
         public int ExecuteNonQuery(DbCommand command, params UDbParameter[] parameters)
         {
-            // agregar los parametros al comando
-            command.AddParameter(parameters);
-
             // asociar el contexto de datos
-            LinkDbContext(command);
+            LinkDbContext(command, parameters);
 
             // ejecutar la instrucción
             return command.ExecuteNonQuery();
@@ -299,9 +299,36 @@ namespace JclunaOficial
         /// <returns><see cref="int"/> con el número de registros afectados</returns>
         public int ExecuteNonQuery(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
         {
-            // ejecutar la instrucción sobrecargada
             using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
                 return ExecuteNonQuery(command, null);
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un valor
+        /// </summary>
+        /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
+        /// <returns>Regresar un <see cref="object"/> con el valor que regresa la instrucción</returns>
+        public object ExecuteScalar(DbCommand command, params UDbParameter[] parameters)
+        {
+            // asociar el contexto de datos
+            LinkDbContext(command, parameters);
+
+            // ejecutar la instrucción
+            return command.ExecuteScalar();
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un valor
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns>Regresar un <see cref="object"/> con el valor que regresa la instrucción</returns>
+        public object ExecuteScalar(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
+                return ExecuteScalar(command, null);
         }
     }
 }

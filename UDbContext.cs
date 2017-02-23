@@ -118,6 +118,15 @@ namespace JclunaOficial
             SetupWithProvider(settings.ProviderName, settings.ConnectionString, open, begin, level);
         }
 
+        // asociar el contexto de datos al objeto de comando, incluyendo la transacción actual
+        private void LinkDbContext(DbCommand command)
+        {
+            // asociar la conexión
+            command.Connection = connection;
+            if (transaction != null) // asociar la transacción
+                command.Transaction = transaction;
+        }
+
         /// <summary>
         /// Crear una instancia del tipo <see cref="UDbContext"/>
         /// </summary>
@@ -238,6 +247,61 @@ namespace JclunaOficial
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Crear un objeto del tipo <see cref="DbCommand"/> con la instrucción y los parámetros requeridos
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns></returns>
+        public DbCommand CreateCommand(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            // fabricar el objeto usando el proveedor de datos
+            var objResult = factory.CreateCommand();
+            if (objResult == null) return null;
+
+            // configurar los atributos
+            objResult.CommandType = (isStoredProcedure ?
+                CommandType.StoredProcedure : CommandType.Text);
+            objResult.CommandText = (commandText == null ? "" : commandText.Trim());
+
+            // agregar los parámetros
+            objResult.AddParameter(parameters);
+            return objResult;
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que no regresa datos
+        /// </summary>
+        /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
+        /// <returns><see cref="int"/> con el número de registros afectados</returns>
+        public int ExecuteNonQuery(DbCommand command, params UDbParameter[] parameters)
+        {
+            // agregar los parametros al comando
+            command.AddParameter(parameters);
+
+            // asociar el contexto de datos
+            LinkDbContext(command);
+
+            // ejecutar la instrucción
+            return command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que no regresa datos
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns><see cref="int"/> con el número de registros afectados</returns>
+        public int ExecuteNonQuery(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            // ejecutar la instrucción sobrecargada
+            using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
+                return ExecuteNonQuery(command, null);
         }
     }
 }

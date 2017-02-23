@@ -308,7 +308,7 @@ namespace JclunaOficial
         /// </summary>
         /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
         /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
-        /// <returns>Regresar un <see cref="object"/> con el valor que regresa la instrucción</returns>
+        /// <returns>Regresa un <see cref="object"/> con el valor que regresa la instrucción</returns>
         public object ExecuteScalar(DbCommand command, params UDbParameter[] parameters)
         {
             // asociar el contexto de datos
@@ -324,11 +324,39 @@ namespace JclunaOficial
         /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
         /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
         /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
-        /// <returns>Regresar un <see cref="object"/> con el valor que regresa la instrucción</returns>
+        /// <returns>Regresa un <see cref="object"/> con el valor que regresa la instrucción</returns>
         public object ExecuteScalar(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
         {
             using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
                 return ExecuteScalar(command, null);
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un conjunto de datos en modo conectado
+        /// </summary>
+        /// <param name="command">Objeto <see cref="DbCommand"/> con la intrucción a ejecutar</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos.</param>
+        /// <returns>Regresa un <see cref="DbDataReader"/> conectado al conjunto de datos generados por la instrucción ejecutada</returns>
+        public DbDataReader ExecuteReader(DbCommand command, params UDbParameter[] parameters)
+        {
+            // asociar el contexto de datos
+            LinkDbContext(command, parameters);
+
+            // ejecutar la instrucción y regresar el reader
+            return command.ExecuteReader();
+        }
+
+        /// <summary>
+        /// Ejecutar instrucción que regresa un conjunto de datos en modo conectado
+        /// </summary>
+        /// <param name="isStoredProcedure">Determina si la instrucción es un procedimiento almacenado (StoredProcedure)</param>
+        /// <param name="commandText">Instrucción o procedimiento almacenado que será ejecutado</param>
+        /// <param name="parameters">Lista de <see cref="UDbParameter"/> para los parámetros requeridos</param>
+        /// <returns>Regresa un <see cref="DbDataReader"/> conectado al conjunto de datos generados por la instrucción ejecutada</returns>
+        public DbDataReader ExecuteReader(bool isStoredProcedure, string commandText, params UDbParameter[] parameters)
+        {
+            using (var command = CreateCommand(isStoredProcedure, commandText, parameters))
+                return ExecuteReader(command, null);
         }
     }
 }

@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("UDatabase")]
 [assembly: AssemblyDescription("Librería para el acceso a bases de datos")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Jcluna")]
+[assembly: AssemblyCompany("jcluna.oficial@gmail.com")]
+[assembly: AssemblyProduct("JclunaOficial")]
 [assembly: AssemblyCopyright("Copyright 2017 - Juan C. Luna H.")]
 [assembly: AssemblyVersion("2017.02.22.2154")]
 [assembly: AssemblyFileVersion("2017.02.22.2154")]
